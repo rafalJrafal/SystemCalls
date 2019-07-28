@@ -12,7 +12,7 @@ class System {
 		static void printf(const char * format,  ...) {
 			va_list vListPrintf;
 			va_start (vListPrintf, format);
-			::printf(format, *vListPrintf);
+			::printf(format, vListPrintf);
 			va_end(vListPrintf); 
 		}
 		static std::string getFile(const char * fileName) {
@@ -24,6 +24,7 @@ class System {
 			std::string result, line;
 			while (getline(fileStream, line)) {
 				result.append(line);
+				result.append("\n");
 			}
 			fileStream.close();
 			return result;
