@@ -1,5 +1,4 @@
 #include "../inc/MemoryMap.h"
-#include "../../LogSystem/inc/LogSystem.h"
 
 MemoryMap& MemoryMap::instance() {
 	static MemoryMap memoryMap;

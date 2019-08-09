@@ -13,6 +13,5 @@ class MemoryMap {
 		void markAlloc(void *, size_t);
 		void markFree(void *);
 	private:
-		
 };
 #endif
