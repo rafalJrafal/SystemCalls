@@ -1,4 +1,5 @@
 #include "../inc/MemoryMap.h"
+#include "../../LogSystem/inc/LogSystem.h"
 
 MemoryMap& MemoryMap::instance() {
 	static MemoryMap memoryMap;
@@ -14,7 +15,7 @@ MemoryMap::MemoryMap(MemoryMap&) {
 }
 
 void MemoryMap::markAlloc(void * ptr, size_t size) {
-	
+	LogSystem::LogSystem::memLog("TMPlog\n");
 }
 void MemoryMap::markFree(void * ptr) {
 	
