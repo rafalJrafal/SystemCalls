@@ -3,6 +3,14 @@
 
 #include <cstdlib>
 
+struct MemoryAllocation {
+	MemoryAllocation() : address(0), size(0), isAllocated(true) {
+	}
+	void * address;
+	size_t size;
+	bool isAllocated;
+};
+
 class MemoryMap {
 	private:
 		MemoryMap();
@@ -13,5 +21,6 @@ class MemoryMap {
 		void markAlloc(void *, size_t);
 		void markFree(void *);
 	private:
+		
 };
 #endif
