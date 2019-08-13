@@ -31,6 +31,7 @@ class MemoryMap {
 		void markFree(void *);
 	private:
 		void addMemoryItem(MemoryAllocationItem);
+		void markMemoryItemFree(void * ptr);
 		void printMemory();
 		MemoryAllocationItem * mFirst;
 };

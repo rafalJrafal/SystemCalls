@@ -23,8 +23,10 @@ void MemoryMap::markAlloc(void * ptr, size_t size) {
 	addMemoryItem(MemoryAllocationItem(mem));
 	printMemory();
 }
+
 void MemoryMap::markFree(void * ptr) {
 	LogSystem::LogSystem::memLog("Deallocated memory at ptr = %p", ptr);
+	markMemoryItemFree(ptr);
 }
 
 void MemoryMap::addMemoryItem(MemoryAllocationItem item) {
@@ -49,11 +51,24 @@ void MemoryMap::addMemoryItem(MemoryAllocationItem item) {
 	}
 }
 
+void MemoryMap::markMemoryItemFree(void * ptr) {
+	MemoryAllocationItem * item = mFirst;
+	int foundAllocations = 0;
+	while (item != 0) {
+			if (item->isAllocated = true) {
+				item->isAllocated = false;
+				LogSystem::LogSystem::memLog("\tDeallocated memory size = %d", item->size);
+				return;
+			}
+			item = item->nextItem;
+	}
+} 
+
 void MemoryMap::printMemory() {
 	MemoryAllocationItem * item = mFirst;
 	LogSystem::LogSystem::memLog("\tAllocated memory");
 	if (item == 0) LogSystem::LogSystem::memLog("\t\t Empty.");
-	while (item = 0) {
+	while (item != 0) {
 			LogSystem::LogSystem::memLog("\t\tPtr = %p, size = %d, isAllocated = %b", item->address, item->size, item->isAllocated);
 			item = item->nextItem;
 	}
