@@ -30,11 +30,16 @@ class MemoryMap {
 		
 		void markAlloc(void *, size_t);
 		void markFree(void *);
+		void printRemainingAllocations();
+		
 	private:
 		void addMemoryItem(MemoryAllocationItem);
 		void markMemoryItemFree(void * ptr);
 		void printMemory();
 		MemoryAllocationItem * mFirst;
+		
+		int mAllocationNumber;
+		int mDeallocationNumber;
 };
 
 #endif

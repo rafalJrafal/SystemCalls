@@ -6,7 +6,7 @@ MemoryMap& MemoryMap::instance() {
 	return memoryMap;
 }
 
-MemoryMap::MemoryMap() : mFirst(0) {
+MemoryMap::MemoryMap() : mFirst(0), mAllocationNumber(0), mDeallocationNumber(0) {
 	
 }
 
@@ -20,12 +20,14 @@ void MemoryMap::markAlloc(void * ptr, size_t size) {
 	mem.address = ptr;
 	mem.size = size;
 	mem.isAllocated = true;
+	mAllocationNumber++;
 	addMemoryItem(MemoryAllocationItem(mem));
 	printMemory();
 }
 
 void MemoryMap::markFree(void * ptr) {
 	LogSystem::LogSystem::memLog("Deallocated memory at\tptr = %p", ptr);
+	mDeallocationNumber++;
 	markMemoryItemFree(ptr);
 	printMemory();
 }
@@ -77,7 +79,7 @@ void MemoryMap::printMemory() {
 				item->address, item->size, item->isAllocated, sizeUsed);
 			item = item->nextItem;
 	}
-	LogSystem::LogSystem::memLog("\tAll size used = %d", sizeUsed);
+	LogSystem::LogSystem::memLog("\tAll size used = %d. Allocations = %d. Deallocations = %d", sizeUsed, mAllocationNumber, mDeallocationNumber);
 }
 
 MemoryMap::~MemoryMap() {
@@ -87,4 +89,23 @@ MemoryMap::~MemoryMap() {
 			item = item->nextItem;
 			free(toBeRemoved);
 	}
+}
+
+void MemoryMap::printRemainingAllocations() {
+	MemoryAllocationItem * item = mFirst;
+	LogSystem::LogSystem::memLog("\n==================================================");
+	LogSystem::LogSystem::memLog("\nRemaining allocations:");
+	unsigned long count = 0;
+	size_t remainingSize = 0;
+	while (item != 0) {
+			if (item->isAllocated) {
+				LogSystem::LogSystem::memLog("\t\tPtr = %p,\tsize = %d,\tisAllocated = %d.", 
+					item->address, item->size, item->isAllocated);
+				count++;
+				remainingSize += item->size;
+			}
+			item = item->nextItem;
+	}
+	LogSystem::LogSystem::memLog("Number of remaining allocations = %d", count, remainingSize);
+	LogSystem::LogSystem::memLog("\n==================================================");
 }
