@@ -15,8 +15,8 @@ MemoryMap::MemoryMap(MemoryMap&) {
 }
 
 void MemoryMap::markAlloc(void * ptr, size_t size) {
-	LogSystem::LogSystem::memLog("Allocated memory at ptr = %p size = %d.", ptr, size);
-	struct MemoryAllocation mem;// = (MemoryAllocation*)malloc(sizeof(MemoryAllocation));
+	LogSystem::LogSystem::memLog("Allocated memory at\tptr = %p\tsize = %d.", ptr, size);
+	struct MemoryAllocation mem;
 	mem.address = ptr;
 	mem.size = size;
 	mem.isAllocated = true;
@@ -25,8 +25,9 @@ void MemoryMap::markAlloc(void * ptr, size_t size) {
 }
 
 void MemoryMap::markFree(void * ptr) {
-	LogSystem::LogSystem::memLog("Deallocated memory at ptr = %p", ptr);
+	LogSystem::LogSystem::memLog("Deallocated memory at\tptr = %p", ptr);
 	markMemoryItemFree(ptr);
+	printMemory();
 }
 
 void MemoryMap::addMemoryItem(MemoryAllocationItem item) {
@@ -67,10 +68,16 @@ void MemoryMap::printMemory() {
 	MemoryAllocationItem * item = mFirst;
 	LogSystem::LogSystem::memLog("\tAllocated memory");
 	if (item == 0) LogSystem::LogSystem::memLog("\t\t Empty.");
+	size_t sizeUsed = 0;
 	while (item != 0) {
-			LogSystem::LogSystem::memLog("\t\tPtr = %p, size = %d, isAllocated = %d", item->address, item->size, item->isAllocated);
+			if (item->isAllocated) {
+				sizeUsed += item->size;
+			}
+			LogSystem::LogSystem::memLog("\t\tPtr = %p,\tsize = %d,\tisAllocated = %d.\tAll Size Used = %d", 
+				item->address, item->size, item->isAllocated, sizeUsed);
 			item = item->nextItem;
 	}
+	LogSystem::LogSystem::memLog("\tAll size used = %d", sizeUsed);
 }
 
 MemoryMap::~MemoryMap() {
