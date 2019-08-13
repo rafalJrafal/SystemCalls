@@ -11,6 +11,15 @@ struct MemoryAllocation {
 	bool isAllocated;
 };
 
+struct MemoryAllocationItem : public MemoryAllocation {
+	MemoryAllocationItem(MemoryAllocation & e) {
+		address = e.address;
+		size = e.size;
+		isAllocated = e.isAllocated;
+	}
+	MemoryAllocationItem * nextItem;
+};
+
 class MemoryMap {
 	private:
 		MemoryMap();
@@ -21,6 +30,9 @@ class MemoryMap {
 		void markAlloc(void *, size_t);
 		void markFree(void *);
 	private:
-		
+		void addMemoryItem(MemoryAllocationItem);
+		void printMemory();
+		MemoryAllocationItem * mFirst;
 };
+
 #endif
