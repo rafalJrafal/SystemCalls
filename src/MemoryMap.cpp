@@ -53,9 +53,8 @@ void MemoryMap::addMemoryItem(MemoryAllocationItem item) {
 
 void MemoryMap::markMemoryItemFree(void * ptr) {
 	MemoryAllocationItem * item = mFirst;
-	int foundAllocations = 0;
 	while (item != 0) {
-			if (item->isAllocated = true) {
+			if (item->isAllocated == true && item->address == ptr) {
 				item->isAllocated = false;
 				LogSystem::LogSystem::memLog("\tDeallocated memory size = %d", item->size);
 				return;
@@ -69,7 +68,16 @@ void MemoryMap::printMemory() {
 	LogSystem::LogSystem::memLog("\tAllocated memory");
 	if (item == 0) LogSystem::LogSystem::memLog("\t\t Empty.");
 	while (item != 0) {
-			LogSystem::LogSystem::memLog("\t\tPtr = %p, size = %d, isAllocated = %b", item->address, item->size, item->isAllocated);
+			LogSystem::LogSystem::memLog("\t\tPtr = %p, size = %d, isAllocated = %d", item->address, item->size, item->isAllocated);
 			item = item->nextItem;
+	}
+}
+
+MemoryMap::~MemoryMap() {
+	MemoryAllocationItem * item = mFirst;
+	while (item != 0) {
+			MemoryAllocationItem * toBeRemoved = item;
+			item = item->nextItem;
+			free(toBeRemoved);
 	}
 }

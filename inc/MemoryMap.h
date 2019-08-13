@@ -26,6 +26,7 @@ class MemoryMap {
 		MemoryMap(MemoryMap&);
 	public:
 		static MemoryMap & instance();
+		~MemoryMap();
 		
 		void markAlloc(void *, size_t);
 		void markFree(void *);
