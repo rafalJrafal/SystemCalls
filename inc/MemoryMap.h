@@ -29,8 +29,16 @@ class MemoryMap {
 		~MemoryMap();
 		
 		void markAlloc(void *, size_t);
+		void markAlloc(void *, size_t, const char *, int);
 		void markFree(void *);
 		void printRemainingAllocations();
+		
+		void setPrintAllocations(bool b) {
+			mPrintAllocations = b;
+		}
+		void setPrintDeallocations(bool b) {
+			mPrintDeallocations = b;
+		}
 		
 	private:
 		void addMemoryItem(MemoryAllocationItem);
@@ -40,6 +48,8 @@ class MemoryMap {
 		
 		int mAllocationNumber;
 		int mDeallocationNumber;
+		
+		bool mPrintAllocations, mPrintDeallocations;
 };
 
 #endif

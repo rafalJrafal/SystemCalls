@@ -6,7 +6,7 @@ MemoryMap& MemoryMap::instance() {
 	return memoryMap;
 }
 
-MemoryMap::MemoryMap() : mFirst(0), mAllocationNumber(0), mDeallocationNumber(0) {
+MemoryMap::MemoryMap() : mFirst(0), mAllocationNumber(0), mDeallocationNumber(0), mPrintAllocations(true), mPrintDeallocations(true) {
 	
 }
 
@@ -15,21 +15,34 @@ MemoryMap::MemoryMap(MemoryMap&) {
 }
 
 void MemoryMap::markAlloc(void * ptr, size_t size) {
-	LogSystem::LogSystem::memLog("Allocated memory at\tptr = %p\tsize = %d.", ptr, size);
+	if (mPrintAllocations) LogSystem::LogSystem::memLog("Allocated memory at\tptr = %p\tsize = %d.", ptr, size);
 	struct MemoryAllocation mem;
 	mem.address = ptr;
 	mem.size = size;
 	mem.isAllocated = true;
 	mAllocationNumber++;
 	addMemoryItem(MemoryAllocationItem(mem));
-	printMemory();
+	if (mPrintAllocations) printMemory();
+}
+
+void MemoryMap::markAlloc(void * ptr, size_t size, const char * file, int line) {
+	if (mPrintAllocations) LogSystem::LogSystem::memLog("Allocated memory at\tptr = %p\tsize = %d. From %s : %d", ptr, size, file, line);
+	struct MemoryAllocation mem;
+	mem.address = ptr;
+	mem.size = size;
+	mem.isAllocated = true;
+	mem.size = size;
+	mAllocationNumber++;
+	addMemoryItem(MemoryAllocationItem(mem));
+	if (mPrintAllocations) printMemory();
+	
 }
 
 void MemoryMap::markFree(void * ptr) {
-	LogSystem::LogSystem::memLog("Deallocated memory at\tptr = %p", ptr);
+	if (mPrintDeallocations) LogSystem::LogSystem::memLog("\t\t\t\tDeallocated memory at\tptr = %p", ptr);
 	mDeallocationNumber++;
 	markMemoryItemFree(ptr);
-	printMemory();
+	if (mPrintDeallocations) printMemory();
 }
 
 void MemoryMap::addMemoryItem(MemoryAllocationItem item) {
@@ -75,7 +88,7 @@ void MemoryMap::printMemory() {
 			if (item->isAllocated) {
 				sizeUsed += item->size;
 			}
-			LogSystem::LogSystem::memLog("\t\tPtr = %p,\tsize = %d,\tisAllocated = %d.\tAll Size Used = %d", 
+			LogSystem::LogSystem::memLog("\t\tPtr = %p,\tsize = %d, \tisAllocated = %d.\tAll Size Used = %d", 
 				item->address, item->size, item->isAllocated, sizeUsed);
 			item = item->nextItem;
 	}
