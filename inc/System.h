@@ -5,6 +5,8 @@
 #include <string.h>
 #include <fstream>
 
+#include "../../SystemCalls/inc/MemoryMonitorInclude.h"
+
 namespace SystemCalls {
 
 class System {

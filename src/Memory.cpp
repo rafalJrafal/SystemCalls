@@ -5,15 +5,6 @@
 #include "../inc/MemoryMap.h"
 
 
-/*
-void * operator new(size_t size) throw(std::bad_alloc) {
-	printf("new");
-	void * m = malloc(size);
-	static MemoryMap & memoryMap = MemoryMap::instance();
-	memoryMap.markAlloc(m, size);
-	return m;
-} */
-
 void * operator new(size_t size, const char * file, int line) {
 	void * m = malloc(size);
 	static MemoryMap & memoryMap = MemoryMap::instance();

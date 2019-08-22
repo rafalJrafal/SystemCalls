@@ -2,13 +2,17 @@
 #define MEMORYMAP_H
 
 #include <cstdlib>
+#include <string.h>
 
 struct MemoryAllocation {
-	MemoryAllocation() : address(0), size(0), isAllocated(true) {
+	MemoryAllocation() : address(0), size(0), isAllocated(true), line(0) {
+		strcpy(fileName, "UNDEFINED");
 	}
 	void * address;
 	size_t size;
 	bool isAllocated;
+	char fileName[100];
+	int line;
 };
 
 struct MemoryAllocationItem : public MemoryAllocation {
@@ -16,6 +20,8 @@ struct MemoryAllocationItem : public MemoryAllocation {
 		address = e.address;
 		size = e.size;
 		isAllocated = e.isAllocated;
+		strcpy(fileName, e.fileName);
+		line = e.line;
 	}
 	MemoryAllocationItem * nextItem;
 };
@@ -36,8 +42,11 @@ class MemoryMap {
 		void setPrintAllocations(bool b) {
 			mPrintAllocations = b;
 		}
-		void setPrintDeallocations(bool b) {
-			mPrintDeallocations = b;
+		void setPrintOtherDeallocations(bool b) {
+			mPrintOtherDeallocations = b;
+		}
+		void setPrintSelfDeallocations(bool b) {
+			mPrintSelfDeallocations = b;
 		}
 		
 	private:
@@ -49,7 +58,7 @@ class MemoryMap {
 		int mAllocationNumber;
 		int mDeallocationNumber;
 		
-		bool mPrintAllocations, mPrintDeallocations;
+		bool mPrintAllocations, mPrintOtherDeallocations, mPrintSelfDeallocations;
 };
 
 #endif

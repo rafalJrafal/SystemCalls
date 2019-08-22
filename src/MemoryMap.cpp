@@ -6,7 +6,8 @@ MemoryMap& MemoryMap::instance() {
 	return memoryMap;
 }
 
-MemoryMap::MemoryMap() : mFirst(0), mAllocationNumber(0), mDeallocationNumber(0), mPrintAllocations(true), mPrintDeallocations(true) {
+MemoryMap::MemoryMap() : mFirst(0), mAllocationNumber(0), mDeallocationNumber(0), mPrintAllocations(true), 
+	mPrintOtherDeallocations(true), mPrintSelfDeallocations(true) {
 	
 }
 
@@ -15,7 +16,7 @@ MemoryMap::MemoryMap(MemoryMap&) {
 }
 
 void MemoryMap::markAlloc(void * ptr, size_t size) {
-	if (mPrintAllocations) LogSystem::LogSystem::memLog("Allocated memory at\tptr = %p\tsize = %d.", ptr, size);
+	if (mPrintAllocations) LogSystem::LogSystem::memLog("MarkAlloc:\t\tptr = %p\t\tsize = %d.", ptr, size);
 	struct MemoryAllocation mem;
 	mem.address = ptr;
 	mem.size = size;
@@ -26,12 +27,14 @@ void MemoryMap::markAlloc(void * ptr, size_t size) {
 }
 
 void MemoryMap::markAlloc(void * ptr, size_t size, const char * file, int line) {
-	if (mPrintAllocations) LogSystem::LogSystem::memLog("Allocated memory at\tptr = %p\tsize = %d. From %s : %d", ptr, size, file, line);
+	if (mPrintAllocations) LogSystem::LogSystem::memLog("MarkAlloc:\t\tptr = %p\t\tsize = %d. %s : %d", ptr, size, file, line);
 	struct MemoryAllocation mem;
 	mem.address = ptr;
 	mem.size = size;
 	mem.isAllocated = true;
 	mem.size = size;
+	strcpy(mem.fileName, file);
+	mem.line = line;
 	mAllocationNumber++;
 	addMemoryItem(MemoryAllocationItem(mem));
 	if (mPrintAllocations) printMemory();
@@ -39,10 +42,26 @@ void MemoryMap::markAlloc(void * ptr, size_t size, const char * file, int line) 
 }
 
 void MemoryMap::markFree(void * ptr) {
-	if (mPrintDeallocations) LogSystem::LogSystem::memLog("\t\t\t\tDeallocated memory at\tptr = %p", ptr);
-	mDeallocationNumber++;
-	markMemoryItemFree(ptr);
-	if (mPrintDeallocations) printMemory();
+	bool foundItemToFree = false;
+
+	MemoryAllocationItem * item = mFirst;
+	while (item != 0) {
+			if (item->isAllocated == true && item->address == ptr) {
+				foundItemToFree = true;
+				break;
+			}
+			item = item->nextItem;
+	}
+	if (foundItemToFree) {
+		if (mPrintSelfDeallocations) LogSystem::LogSystem::memLog("Deallocated memory at\tptr = %p. File %s : %d", 
+			ptr, item->fileName, item->line);
+		mDeallocationNumber++;
+		markMemoryItemFree(ptr);
+		if (mPrintSelfDeallocations) printMemory();
+	}
+	else {
+		if (mPrintOtherDeallocations) LogSystem::LogSystem::memLog("\t\t\t\tFound deallocated memory at\tptr = %p", ptr);
+	}
 }
 
 void MemoryMap::addMemoryItem(MemoryAllocationItem item) {
@@ -51,6 +70,8 @@ void MemoryMap::addMemoryItem(MemoryAllocationItem item) {
 		mFirst->address = item.address;
 		mFirst->size = item.size;
 		mFirst->isAllocated = item.isAllocated;
+		strcpy(mFirst->fileName, item.fileName);
+		mFirst->line = item.line;
 		mFirst->nextItem = 0;
 	}
 	else {
@@ -59,6 +80,8 @@ void MemoryMap::addMemoryItem(MemoryAllocationItem item) {
 		newElement->size = item.size;
 		newElement->isAllocated = item.isAllocated;
 		newElement->nextItem = 0;
+		strcpy(newElement->fileName, item.fileName);
+		newElement->line = item.line;
 		MemoryAllocationItem * last = mFirst;
 		while (last->nextItem != 0) {
 			last = last->nextItem;
@@ -88,8 +111,8 @@ void MemoryMap::printMemory() {
 			if (item->isAllocated) {
 				sizeUsed += item->size;
 			}
-			LogSystem::LogSystem::memLog("\t\tPtr = %p,\tsize = %d, \tisAllocated = %d.\tAll Size Used = %d", 
-				item->address, item->size, item->isAllocated, sizeUsed);
+			LogSystem::LogSystem::memLog("\tPtr = %p,\tsize = %d, \t isAllocated = %d. File: %s : %d All Size Used = %d", 
+				item->address, item->size, item->isAllocated, item->fileName, item->line, (int)sizeUsed);
 			item = item->nextItem;
 	}
 	LogSystem::LogSystem::memLog("\tAll size used = %d. Allocations = %d. Deallocations = %d", sizeUsed, mAllocationNumber, mDeallocationNumber);
@@ -112,8 +135,8 @@ void MemoryMap::printRemainingAllocations() {
 	size_t remainingSize = 0;
 	while (item != 0) {
 			if (item->isAllocated) {
-				LogSystem::LogSystem::memLog("\t\tPtr = %p,\tsize = %d,\tisAllocated = %d.", 
-					item->address, item->size, item->isAllocated);
+				LogSystem::LogSystem::memLog("\t\tPtr = %p,\tsize = %d,\tisAllocated = %d from file %s : %d", 
+					item->address, item->size, item->isAllocated, item->fileName, item->line);
 				count++;
 				remainingSize += item->size;
 			}
