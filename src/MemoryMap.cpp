@@ -53,7 +53,7 @@ void MemoryMap::markFree(void * ptr) {
 			item = item->nextItem;
 	}
 	if (foundItemToFree) {
-		if (mPrintSelfDeallocations) LogSystem::LogSystem::memLog("Deallocated memory at\tptr = %p. File %s : %d", 
+		if (mPrintSelfDeallocations) LogSystem::LogSystem::memLog("Deallocated memory from \tptr = %p. File %s : %d", 
 			ptr, item->fileName, item->line);
 		mDeallocationNumber++;
 		markMemoryItemFree(ptr);
